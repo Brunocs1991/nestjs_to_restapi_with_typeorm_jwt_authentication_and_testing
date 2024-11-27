@@ -1,4 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ConceptsCreatedManuallyController } from './concepts-created-manually.controller';
 
-@Module({})
+@Module({
+  imports: [],
+  controllers: [ConceptsCreatedManuallyController],
+  providers: [],
+})
 export class ConceptsCreatedManuallyModule {}
