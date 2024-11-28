@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 
@@ -24,5 +26,18 @@ export class MessagesController {
   @Post()
   create(@Body() body: any) {
     return body;
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() body: any) {
+    return {
+      id,
+      ...body,
+    };
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return `This action removes a ${id} message`;
   }
 }
