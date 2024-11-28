@@ -10,38 +10,36 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { MessagesService } from './messages.service';
 
 @Controller('messages')
 export class MessagesController {
+  constructor(private readonly messagesService: MessagesService) {}
+
   @Get()
   findAll(@Query() pagination: any) {
-    const { limit = 5, offset = 5 } = pagination;
-    return {
-      body: `return all messages. limit: ${limit}, offset: ${offset}`,
-    };
+    const { limit = 5, offset = 0 } = pagination;
+    return this.messagesService.findAll(limit, offset);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return `This action returns a ${id} message`;
+    return this.messagesService.findOne(id);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Post()
   create(@Body() body: any) {
-    return body;
+    return this.messagesService.create(body);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: any) {
-    return {
-      id,
-      ...body,
-    };
+    return this.messagesService.update(id, body);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return `This action removes a ${id} message`;
+    this.messagesService.remove(id);
   }
 }
