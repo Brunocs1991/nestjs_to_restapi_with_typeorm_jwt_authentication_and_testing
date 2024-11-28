@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
+import { Message } from '../../domain/message';
 
 @Controller('messages')
 export class MessagesController {
@@ -28,12 +29,12 @@ export class MessagesController {
   }
 
   @Post()
-  create(@Body() body: any) {
+  create(@Body() body: Message) {
     return this.messagesService.create(body);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: any) {
+  update(@Param('id') id: string, @Body() body: Message) {
     return this.messagesService.update(id, body);
   }
 
