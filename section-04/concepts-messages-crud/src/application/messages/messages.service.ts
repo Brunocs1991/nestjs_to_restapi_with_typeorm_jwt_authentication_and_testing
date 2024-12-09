@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../../domain/message';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessagesService {
@@ -12,6 +14,7 @@ export class MessagesService {
       to: 'Jane Doe',
       read: false,
       createdAt: new Date(),
+      updatedAt: undefined,
     },
   ];
 
@@ -27,22 +30,26 @@ export class MessagesService {
     return message;
   }
 
-  create(body: Message) {
-    body.id = uuidv4();
-    body.createdAt = new Date();
-    this.messages.push(body);
-    return body;
+  create(createMessageDto: CreateMessageDto) {
+    const newMessage: Message = {
+      id: uuidv4(),
+      ...createMessageDto,
+      read: false,
+      createdAt: new Date(),
+      updatedAt: undefined,
+    };
+    this.messages.push(newMessage);
+    return newMessage;
   }
 
-  update(id: string, body: Partial<Message>) {
+  update(id: string, updateMessageDto: UpdateMessageDto) {
     const index = this.messages.findIndex((message) => message.id === id);
     if (index === -1) {
       this.throwNotFound();
     }
     this.messages[index] = {
       ...this.messages[index],
-      ...body,
-      id,
+      ...updateMessageDto,
       updatedAt: new Date(),
     };
     return this.messages[index];

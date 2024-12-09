@@ -3,7 +3,7 @@ export class Message {
   message: string;
   from: string;
   to: string;
-  read?: boolean;
+  read: boolean;
   createdAt: Date;
-  updatedAt?: Date;
+  updatedAt: Date;
 }
