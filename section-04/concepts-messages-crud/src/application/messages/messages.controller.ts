@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Patch,
   Post,
@@ -38,9 +36,8 @@ export class MessagesController {
     return this.messagesService.update(id, body);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    this.messagesService.remove(id);
+    return this.messagesService.remove(id);
   }
 }

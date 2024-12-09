@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../../domain/message';
 
@@ -16,17 +16,13 @@ export class MessagesService {
   ];
 
   findAll(limit: number, offset: number) {
-    const messages = this.messages.slice(offset, offset + limit);
-    if (messages.length === 0) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
-    }
-    return messages;
+    return this.messages.slice(offset, offset + limit);
   }
 
   findOne(id: string) {
     const message = this.messages.find((message) => message.id === id);
     if (!message) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
+      this.throwNotFound();
     }
     return message;
   }
@@ -41,7 +37,7 @@ export class MessagesService {
   update(id: string, body: Partial<Message>) {
     const index = this.messages.findIndex((message) => message.id === id);
     if (index === -1) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
+      this.throwNotFound();
     }
     this.messages[index] = {
       ...this.messages[index],
@@ -55,9 +51,13 @@ export class MessagesService {
   remove(id: string) {
     const index = this.messages.findIndex((message) => message.id === id);
     if (index === -1) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
+      this.throwNotFound();
     }
     const removed = this.messages.splice(index, 1);
     return removed[0];
+  }
+
+  private throwNotFound() {
+    throw new NotFoundException('Message not found');
   }
 }
