@@ -1,36 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../../domain/message';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { IMessageRepository } from '../../domain/repository/i-message-repository.interface';
 
 @Injectable()
 export class MessagesService {
-  private messages: Message[] = [
-    {
-      id: uuidv4(),
-      message: 'Hello World',
-      from: 'John Doe',
-      to: 'Jane Doe',
-      read: false,
-      createdAt: new Date(),
-      updatedAt: undefined,
-    },
-  ];
+  constructor(
+    @Inject('IMessageRepository')
+    private readonly messageRepository: IMessageRepository,
+  ) {}
 
   findAll(limit: number, offset: number) {
-    return this.messages.slice(offset, offset + limit);
+    return this.messageRepository.findAll(limit, offset);
   }
 
-  findOne(id: string) {
-    const message = this.messages.find((message) => message.id === id);
-    if (!message) {
-      this.throwNotFound();
-    }
-    return message;
+  async findOne(id: string) {
+    return await this.messageRepository
+      .findOne(id)
+      .then()
+      .catch((ex) => {
+        throw ex;
+      });
   }
 
-  create(createMessageDto: CreateMessageDto) {
+  async create(createMessageDto: CreateMessageDto) {
     const newMessage: Message = {
       id: uuidv4(),
       ...createMessageDto,
@@ -38,33 +33,31 @@ export class MessagesService {
       createdAt: new Date(),
       updatedAt: undefined,
     };
-    this.messages.push(newMessage);
-    return newMessage;
+    return await this.messageRepository.create(newMessage);
   }
 
-  update(id: string, updateMessageDto: UpdateMessageDto) {
-    const index = this.messages.findIndex((message) => message.id === id);
-    if (index === -1) {
-      this.throwNotFound();
-    }
-    this.messages[index] = {
-      ...this.messages[index],
+  async update(id: string, updateMessageDto: UpdateMessageDto) {
+    const message: Message = await this.messageRepository
+      .findOne(id)
+      .then()
+      .catch((ex) => {
+        throw ex;
+      });
+
+    const updatedMessage = {
+      ...message,
       ...updateMessageDto,
       updatedAt: new Date(),
     };
-    return this.messages[index];
+    return this.messageRepository.update(id, updatedMessage);
   }
 
-  remove(id: string) {
-    const index = this.messages.findIndex((message) => message.id === id);
-    if (index === -1) {
-      this.throwNotFound();
-    }
-    const removed = this.messages.splice(index, 1);
-    return removed[0];
-  }
-
-  private throwNotFound() {
-    throw new NotFoundException('Message not found');
+  async remove(id: string) {
+    return await this.messageRepository
+      .remove(id)
+      .then()
+      .catch((ex) => {
+        throw ex;
+      });
   }
 }
